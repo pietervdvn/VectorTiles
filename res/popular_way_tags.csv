@@ -1,0 +1,128 @@
+building,yes
+highway,residential
+building,house
+highway,service
+highway,track
+wall,no
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2010
+highway,unclassified
+source,Bing
+waterway,stream
+source,BAG
+oneway,yes
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011
+surface,asphalt
+highway,footway
+building,residential
+natural,water
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2012
+highway,path
+source,bing
+highway,tertiary
+source,YahooJapan/ALPSMAP
+source,NRCan-CanVec-10.0
+access,private
+landuse,residential
+natural,wood
+landuse,farmland
+surface,unpaved
+service,driveway
+source,cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014
+landuse,forest
+highway,secondary
+bridge,yes
+source,cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2013
+service,parking_aisle
+barrier,fence
+building,garage
+source,cuzk:ruian
+surface,paved
+source,cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2015
+oneway,no
+landuse,grass
+building,apartments
+amenity,parking
+source,NHD
+foot,yes
+highway,primary
+barrier,wall
+lit,yes
+source,kapor2
+landuse,meadow
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2013
+source,Kartverket N50
+source,extraction vectorielle v1 cadastre-dgi-fr source : Direction Générale des Impôts - Cadas. Mise à jour : 2010
+bicycle,yes
+source,NRCan-CanVec-8.0
+intermittent,yes
+railway,rail
+natural,scrub
+source,cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2017
+source,cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2016
+source,NRCan-CanVec-7.0
+source,3dShapes
+tracktype,grade3
+waterway,ditch
+natural,wetland
+surface,ground
+source,digitalglobe
+source,cuzk:km
+tracktype,grade2
+leisure,pitch
+building,industrial
+building,hut
+building,detached
+surface,gravel
+source,survey
+source,Regione Emilia Romagna
+attribution,NHD
+gauge,1435
+waterway,river
+barrier,hedge
+boundary,administrative
+tracktype,grade4
+building,shed
+highway,living_street
+highway,cycleway
+highway,trunk
+natural,coastline
+service,alley
+source,CanVec 6.0 - NRCan
+building,roof
+parking,surface
+area,yes
+tracktype,grade1
+import,budovy201004
+footway,sidewalk
+highway,steps
+source_ref,http://wiki.osm.org/wiki/GSI_KIBAN
+leisure,swimming_pool
+tracktype,grade5
+source,RABA-KGZ
+bicycle,no
+highway,motorway
+tunnel,yes
+tunnel,culvert
+surface,concrete
+foot,designated
+waterway,drain
+leisure,park
+import,yes
+landuse,farmyard
+electrified,contact_line
+building,commercial
+source,Japan GSI ortho Imagery
+source,GSI/KIBAN 2500 NARO
+usage,main
+highway,motorway_link
+electrified,no
+water,pond
+source,geoimage.at
+landuse,orchard
+surface,dirt
+surface,paving_stones
+lit,no
+bicycle,designated
+source,Geobase_Import_2009
+amenity,place_of_worship
+footway,crossing

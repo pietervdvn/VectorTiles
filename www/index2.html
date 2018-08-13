@@ -1,0 +1,50 @@
+!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+
+  <div id='map'></div>
+  <script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoicGlldGVydmR2biIsImEiOiJjamJjOWh4ZjYwcmduMnFscGVob2dubzQ1In0.7NLbmRJ-8C_FZzd3JU2eNw';
+  var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/pietervdvn/cjkn4sheu7tek2rof6u60iipw', // stylesheet location
+    center: [-93.261, 44.971], // starting position [lng, lat]
+    zoom: 10 // starting zoom
+  });
+
+  map.on('load', function() {
+    map.addLayer({
+      id: 'historical-places',
+      type: 'circle',
+      source: {
+        type: 'vector',
+        url: 'mapbox://pietervdvn.2el6uc8k'
+      },
+      'source-layer': 'HPC_landmarks-3qumg9',
+    });
+  });
+
+  </script>
+
+  </body>
+</html>

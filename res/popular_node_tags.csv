@@ -1,0 +1,128 @@
+power,tower
+natural,tree
+source,BAG
+power,pole
+highway,crossing
+attribution,Office of Geographic and Environmental Information (MassGIS)
+highway,bus_stop
+source,PGS
+source,Bing
+highway,turning_circle
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2009
+barrier,gate
+leaf_type,broadleaved
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre  mise à jour : 2009
+source,NRCan-CanVec-10.0
+source,AWS Web API
+place,locality
+place,village
+place,hamlet
+highway,traffic_signals
+bus,yes
+source,OSAK (2010)
+highway,street_lamp
+entrance,yes
+amenity,bench
+emergency,fire_hydrant
+public_transport,platform
+source,survey
+source,NRCan-CanVec-7.0
+source,bing
+source,CanVec 6.0 - NRCan
+attribution,NHD
+amenity,restaurant
+leaf_cycle,deciduous
+source,SanGIS Addresses Public Domain (http://www.sangis.org/)
+source,cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2014
+public_transport,stop_position
+railway,level_crossing
+crossing,uncontrolled
+natural,peak
+bicycle,yes
+denotation,urban
+foot,yes
+tourism,information
+crossing,traffic_signals
+wheelchair,yes
+amenity,place_of_worship
+amenity,school
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre  mise à jour : 2008
+source,IBGE
+highway,stop
+source,PGS(could be inacurately)
+noexit,yes
+source,NHD_import_v0.2_20090219152958
+entrance,main
+source,Instituto Geográfico Nacional
+material,wood
+source,cadastre-dgi-fr source : Direction Générale des Finances Publiques - Cadastre. Mise à jour : 2015
+building,yes
+shelter,yes
+religion,christian
+shop,convenience
+crossing_ref,zebra
+crossing,zebra
+access,private
+amenity,parking
+backrest,yes
+man_made,survey_point
+source,NHD_import_v0.2_20090214214316
+attribution,http://wiki.osm.org/wiki/Attribution#LINZ
+place,isolated_dwelling
+source_ref,http://www.linz.govt.nz/topography/topo-maps/
+amenity,cafe
+railway,switch
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2010
+source,KSJ2
+barrier,bollard
+building,house
+amenity,waste_basket
+highway,give_way
+source,Kartverket
+amenity,fuel
+source,Plan polyvalent Douala
+shelter,no
+information,guidepost
+amenity,post_box
+power,generator
+amenity,fast_food
+amenity,bank
+source,NRCan-CanVec-8.0
+wheelchair,no
+shop,supermarket
+source,sobzeros
+source,Landsat 8 du 12/01/2015
+amenity,pharmacy
+barrier,lift_gate
+bench,yes
+source,Geoportal Berlin / Hauskoordinaten
+amenity,recycling
+man_made,tower
+ford,yes
+amenity,bicycle_parking
+design,h-frame
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2013
+shop,clothes
+tourism,hotel
+source,NHD
+entrance,staircase
+source,naptan_import
+source,digitalglobe
+amenity,drinking_water
+amenity,toilets
+historic,memorial
+denotation,avenue
+import_uuid,bb7269ee-502a-5391-8056-e3ce0e66489c
+highway,motorway_junction
+traffic_sign,city_limit
+natural,rock
+shop,hairdresser
+source,Regione_del_Veneto_LR28_16.7.1976_Formazione_CTR_auth_39164-5700-1100_23.01.2009
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2012
+hiking,yes
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2014
+source,Nantes Métropole 11/2011
+source,cadastre-dgi-fr source : Direction Générale des Impôts - Cadastre. Mise à jour : 2011
+source,GURS
+bench,no
+amenity,atm
