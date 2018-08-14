@@ -5,9 +5,12 @@ import java.lang.reflect.Field;
 
 public class StylingProperties {
 
-	public Color linecolor, fillcolor;
+	public Color linecolor, fillcolor, fontcolor;
 	public int nodesize = 3
-			, linewidth = 1;
+			, linewidth = 1
+			, fontsize = 12;
+	
+	public String font, text, fonteffect;
 	
 	@Override
 	public String toString() {
@@ -22,5 +25,23 @@ public class StylingProperties {
 		}
 		return "{"+result+"}";
 	}
+	
+	
+	public StylingProperties mergeWith(StylingProperties other) {
+		if(other == null) {
+			return this;
+		}
+		StylingProperties sp = new StylingProperties();
+		for (Field f : this.getClass().getDeclaredFields()) {
+			try {
+				f.set(sp, f.get(other));
+				f.set(sp, f.get(this));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return sp;
+	}
+	
 
 }

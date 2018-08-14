@@ -10,10 +10,12 @@ import vectortile.tools.Remapper;
 public class Way extends Taggable {
 
 	private final List<Long> nodes;
+	private Node center;
 
-	public Way(Tags tags, List<Long> nodes) {
+	public Way(Tags tags, List<Long> nodes, Node center) {
 		super(tags);
 		this.nodes = nodes;
+		this.center = center;
 	}
 
 	public void remap(Remapper rewrite) {
@@ -29,13 +31,30 @@ public class Way extends Taggable {
 		String result = "way ";
 		for (Long nid : nodes.subList(0, Math.min(3, nodes.size()))) {
 			result += nid + ", ";
-			
+
 		}
 		return result;
 	}
 
 	public List<Long> getNodes() {
 		return nodes;
+	}
+
+	public Node getCenter() {
+		return center;
+	}
+
+	public void setCenter(Node center) {
+		this.center = center;
+	}
+
+	public void calculateCenter(List<Node> allNodes) {
+		int lat = 0, lon = 0;
+		for (long l : nodes) {
+			lat += allNodes.get((int) l).getLat();
+			lon += allNodes.get((int) l).getLon();
+		}
+		this.center = new Node(lat / nodes.size(), lon / nodes.size(), null);
 	}
 
 	public static final Comparator<Way> LENGTH_COMPARATOR_DESC = new Comparator<Way>() {

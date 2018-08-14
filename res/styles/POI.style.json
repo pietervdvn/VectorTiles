@@ -1,0 +1,23 @@
+{
+	"name": "POI",
+	"description": "A simple POI style",
+	"minzoom": 15,
+	"first-selection":[
+		{"natural":"tree"}
+	]
+	,
+	"styles": {
+		"tree": {
+			"fillcolor": "#00FF00",
+			"nodesize": 10
+		}
+	},
+
+	"styling": {
+		"natural" : {
+			"tree" : 
+				"tree",
+		}
+
+	}
+}

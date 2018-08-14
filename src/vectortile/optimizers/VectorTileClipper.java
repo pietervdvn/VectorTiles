@@ -184,7 +184,7 @@ public class VectorTileClipper extends Optimizer {
 			return null;
 		}
 
-		return new Way(w.getTags(), Utils.intList2longList(newIds));
+		return new Way(w.getTags(), Utils.intList2longList(newIds), w.getCenter());
 	}
 
 	private List<Integer> clipPolyWith(List<Integer> newPolygon) {

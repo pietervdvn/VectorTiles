@@ -1,0 +1,30 @@
+{
+	"name": "Names",
+	"description": "This layer visualizes names",
+	"minzoom": 15,
+	"first-selection":[
+		{"landuse":"*"},
+		{"leisure": ["park", "garden"]}
+	]
+	,
+	"styles": {
+		"building":{
+			"fillcolor":"#D9D0C9",
+			"linecolor":"#C6BAB1"
+		},
+		"school": {
+			"base": "building",
+			"fillcolor": "#b5ae6a"
+		},
+	},
+
+	"styling": {
+		"building":{
+			"school": "school",
+			"college": "school",
+			"university":"school",
+			"*" : "building"
+
+		}
+	}
+}

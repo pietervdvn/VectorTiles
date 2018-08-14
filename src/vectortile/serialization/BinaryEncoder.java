@@ -46,18 +46,12 @@ public class BinaryEncoder {
 		out.writeInt(vt.getMaxLat());
 		out.writeInt(vt.getMaxLon());
 
-		
-		boolean compactedTags = vt.getDecoder() != null;
-		out.writeBoolean(compactedTags);
-		if(compactedTags) {
-			writeLessCommonTagTable(out, vt.getDecoder());
-		}
+		writeLessCommonTagTable(out, vt.getDecoder());
 		int taggedNodes = writeNodes(out, vt.getNodes());
 		writeNodes(out, vt.getGhostNodes());
-		writeNodeTagging(out, vt.getNodes(), taggedNodes, compactedTags);
+		writeNodeTagging(out, vt.getNodes(), taggedNodes);
 
-		writeWays(out, vt.getNodeEncodedWays(), vt.getWays(), compactedTags);
-
+		writeWays(out, vt.getNodeEncodedWays(), vt.getWays());
 
 		System.out.println("Done! Written " + out.size() + " bytes");
 	}
@@ -68,14 +62,16 @@ public class BinaryEncoder {
 		writeTagList(out, td.getRelationTags());
 	}
 
-	private static void writeWays(DataOutputStream out, int nodeEncoded, List<Way> ways, boolean compactedTags) throws IOException {
+	private static void writeWays(DataOutputStream out, int nodeEncoded, List<Way> ways)
+			throws IOException {
 		out.writeInt(ways.size() - nodeEncoded);
 		out.writeInt(nodeEncoded);
 
 		for (int i = 0; i < nodeEncoded; i++) {
 			Way w = ways.get(i);
 			out.writeInt(w.getNodes().size() - 1); // All node-encoded ways are closed
-			writeTags(out, w.getTags(), compactedTags);
+			writeCenter(out, w);
+			writeTags(out, w.getTags());
 		}
 
 		for (int i = nodeEncoded; i < ways.size(); i++) {
@@ -85,8 +81,14 @@ public class BinaryEncoder {
 			for (long nodeId : nodeIds) {
 				out.writeInt((int) nodeId);
 			}
-			writeTags(out, w.getTags(), compactedTags);
+			writeCenter(out, w);
+			writeTags(out, w.getTags());
 		}
+	}
+
+	private static void writeCenter(DataOutputStream out, Way w) throws IOException {
+		out.writeInt(w.getCenter().lat);
+		out.writeInt(w.getCenter().lon);
 	}
 
 	private static int writeNodes(DataOutputStream out, List<Node> nodes) throws IOException {
@@ -104,7 +106,8 @@ public class BinaryEncoder {
 		return taggedNodes;
 	}
 
-	private static void writeNodeTagging(DataOutputStream out, List<Node> nodes, int taggedNodes, boolean compactedTags) throws IOException {
+	private static void writeNodeTagging(DataOutputStream out, List<Node> nodes, int taggedNodes)
+			throws IOException {
 		out.writeInt(taggedNodes);
 		for (int i = 0; i < nodes.size(); i++) {
 			Node n = nodes.get(i);
@@ -112,11 +115,11 @@ public class BinaryEncoder {
 				continue;
 			}
 			out.writeInt(i);
-			writeTags(out, n.getTags(), compactedTags);
+			writeTags(out, n.getTags());
 		}
 	}
 
-	private static void writeTags(DataOutputStream out, Tags t, boolean compactedTags) throws IOException {
+	private static void writeTags(DataOutputStream out, Tags t) throws IOException {
 		if (t == null || t.getCount() == 0) {
 			out.writeInt(0);
 			out.writeInt(0);
@@ -136,13 +139,10 @@ public class BinaryEncoder {
 			out.writeInt(i);
 		}
 
-		if(!compactedTags) {
-			writeTagList(out, t.getOtherTags());
-		}else if (t.getOtherTags().size() > 0) {
+		if (t.getOtherTags().size() > 0) {
 			throw new IllegalStateException("All pairs should be encoded at this point");
 		}
-		
-		
+
 	}
 
 	private static void writeTagList(DataOutputStream out, List<Tag> pairs) throws IOException {

@@ -131,4 +131,8 @@ public class TagDecoder {
 		return relationTags;
 	}
 
+	public List<Integer> tagsWithKey(Types t, String key) {
+		return tagsWithKey(t, key, false);
+	}
+
 }

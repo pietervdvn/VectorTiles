@@ -1,4 +1,5 @@
-/vectortile/
-/peer/
-/utils/
 /main/
+/peer/
+/tileFetching/
+/utils/
+/vectortile/

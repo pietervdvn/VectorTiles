@@ -84,6 +84,11 @@ public class OSMXMLParser extends Decoder<VectorTile> {
 				buildList(ways, waysList), //
 				buildList(relations, relationsList));
 		mr.apply(waysList, relationsList);
+		
+		
+		for (Way way : waysList) {
+			way.calculateCenter(nodesList);
+		}
 
 		return new VectorTile(minLat, minLon, maxLat, maxLon, nodesList, waysList, relationsList);
 	}
@@ -139,7 +144,7 @@ public class OSMXMLParser extends Decoder<VectorTile> {
 			createdLast.setTags(createTags());
 			break;
 		case "way":
-			Way w = new Way(createTags(), new ArrayList<>(runningNodeList));
+			Way w = new Way(createTags(), new ArrayList<>(runningNodeList), null);
 			runningNodeList.clear();
 			ways.put(lastWayID, w);
 			break;

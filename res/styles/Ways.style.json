@@ -4,8 +4,7 @@
 	"minzoom": 15,
 	"first-selection":[
 		{"landuse":"*"},
-		{"leisure": ["park", "garden"]},
-		{"amenity": ["school", "college", "kindergarten"]}
+		{"leisure": ["park", "garden"]}
 	]
 	,
 	"styles": {
@@ -16,16 +15,26 @@
 		"lightgreen": {
 			"fillcolor": "#88ff88"
 		},
-		"school":{
-			"fillcolor": "#F0F0D8"
-		},
+
 		"landuse":{
 			"fillcolor":"#999999"
 		},
-		"parking":{
-			"fillcolor":"#cccccc"
+		"building":{
+			"fillcolor":"#D9D0C9",
+			"linecolor":"#C6BAB1"
+		},
+		"otherbuilding":{
+			"fillcolor":"#ffffff",
+			"linecolor":"#C6BAB1"
+		},
+		"white":{
+			"linecolor":"#ffffff",
+			"linewidth":10
+		},
+		"yellow":{
+			"linecolor":"#F7FABF",
+			"linewidth":15
 		}
-
 	},
 
 	"styling": {
@@ -45,12 +54,20 @@
 
 
 		"amenity" : {
-			"school" : "school",
-			"college": "school",
-			"university": "school",
-			"parking":"parking",
-			"*" : "landuse"
+			"*" : "otherbuilding"
 		},
+
+
+		"building":{
+			"*" : "building"
+
+		},
+
+		"highway":{
+			"residential": "white",
+			"tertiary":	"yellow"
+		}
+
 
 	}
 }

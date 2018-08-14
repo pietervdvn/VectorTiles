@@ -59,6 +59,14 @@ public class MultiTagSet {
 
 	public static boolean containsAll(List<Integer> shouldContain, List<Integer> source) {
 		int i = 0;
+		
+		if(shouldContain.size() == 0 || source.size() == 0) {
+			return false;
+		}
+		
+		if(shouldContain.get(0) == null) {
+			return true;
+		}
 		for (Integer searched : shouldContain) {
 			Integer curValue;
 

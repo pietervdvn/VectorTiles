@@ -1,6 +1,7 @@
 package vectortile.style;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +20,9 @@ public class StyleSheet {
 	
 	private Condition condition;
 
+	@SuppressWarnings("unused")
 	private final String name, description;
+	@SuppressWarnings("unused")
 	private final Integer minzoom, maxzoom;
 
 	public StyleSheet(String name, String description, Integer minzoom, Integer maxzoom) {
@@ -52,6 +55,10 @@ public class StyleSheet {
 	}
 
 	public StylingProperties getStyle(String style) {
+		if(!hasStyle(style)) {
+			throw new IllegalArgumentException("Style "+style+" not found. Make sure it is declared and doublecheck for typos."
+					+ "\nKnown styles are "+styles.keySet());
+		}
 		return styles.get(style);
 	}
 
@@ -69,6 +76,19 @@ public class StyleSheet {
 
 	public EncodedCondition encode(Types t, TagDecoder global, VectorTile vt) {
 		return new EncodedCondition(t, global, vt.getDecoder(), condition);
+	}
+	
+	public List<MultiTagSet> getPreliminaryChoicesFor(Types t, VectorTile vt, TagDecoder global){
+		List<MultiTagSet> mtss = new ArrayList<>();
+		for (Tags req : requiredTags) {
+			MultiTagSet mts = new MultiTagSet(global, vt.getDecoder(), t, req);
+			mtss.add(mts);
+		}
+		return mtss;
+	}
+
+	public Map<String, StylingProperties> getStyles() {
+		return styles;
 	}
 
 }

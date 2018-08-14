@@ -2,7 +2,9 @@ package vectortile.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import vectortile.TagDecoder;
 import vectortile.Types;
@@ -126,6 +128,24 @@ public class Tags {
 		List<Tag> newTags = new ArrayList<>(otherTags);
 		newTags.add(t);
 		return new Tags(commonTags, lessCommonTags, newTags);
+	}
+
+	public String getValueOf(Types t, TagDecoder global, TagDecoder local, String key) {
+		Set<Integer> tagsWithKey = new HashSet<>(global.tagsWithKey(t, key));
+		for (int commonTag : commonTags) {
+			if(tagsWithKey.contains(commonTag)) {
+				return global.decode(t, commonTag).value;
+			}
+		}
+		
+		tagsWithKey = new HashSet<>(local.tagsWithKey(t, key));
+		for (int lesscommonTag : lessCommonTags) {
+			if(tagsWithKey.contains(lesscommonTag)) {
+				return local.decode(t, lesscommonTag).value;
+			}
+		}
+		
+		return null;
 	}
 
 

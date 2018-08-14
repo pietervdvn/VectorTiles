@@ -1,0 +1,22 @@
+{
+	"name": "Meta",
+	"description": "Contains special tags to highlight selected ways and such",
+	"minzoom": 15,
+	"first-selection":[
+		{"selected":"*"}
+	]
+	,
+	"styles": {
+		"selected": {
+			"fillcolor": "#2222BB",
+			"linewidth": 4
+		},
+	},
+
+	"styling": {
+		"selected" : {
+			"yes" : 
+				"selected",
+		}
+	}
+}

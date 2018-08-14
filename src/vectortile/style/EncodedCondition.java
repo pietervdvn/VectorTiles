@@ -15,7 +15,9 @@ public class EncodedCondition {
 	private final List<EncodedCondition> matchingConditions;
 	private final StylingProperties style;
 
+	@SuppressWarnings("unused")
 	private final TagDecoder global, local;
+	@SuppressWarnings("unused")
 	private final Types type;
 
 	public EncodedCondition(Types t, TagDecoder global, TagDecoder local, Condition c) {
@@ -45,9 +47,7 @@ public class EncodedCondition {
 					entranceOptions.add(-1 - value);
 				} else {
 					value = local.encode(t, tag);
-					if(value == null) {
-						System.err.println("Warning: dropped "+tag+" as it does not appear in this VT for "+t);
-					}else {
+					if(value != null) {
 						entranceOptions.add(value); 
 					}
 				}
@@ -64,9 +64,14 @@ public class EncodedCondition {
 	}
 
 	public StylingProperties resolve(Tags t) {
+		if(t == null) {
+			return null;
+		}
 		if (oneOfTags == null) {
 			return style;
 		}
+		
+		StylingProperties foundStyle = null;
 		for (int i = 0; i < oneOfTags.size(); i++) {
 
 			List<Integer> options = oneOfTags.get(i);
@@ -81,11 +86,15 @@ public class EncodedCondition {
 				int index = Collections.binarySearch(toSearch, needed);
 				if (index >= 0) {
 					// We found it! Lets take this branch!
-					return matchingConditions.get(i).resolve(t);
+					StylingProperties found = matchingConditions.get(i).resolve(t);
+					if(found == null) {
+						return null;
+					}
+					foundStyle = found.mergeWith(foundStyle);
 				}
 			}
 		}
-		return null;
+		return foundStyle;
 	}
 
 }

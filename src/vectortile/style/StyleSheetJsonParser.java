@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,7 +16,7 @@ import vectortile.data.Tags;
 
 public class StyleSheetJsonParser {
 
-	public StyleSheet parseStyleSheet(String contents) {
+	public static StyleSheet parseStyleSheet(String contents) {
 
 		JSONObject obj = new JSONObject(contents);
 
@@ -31,40 +32,48 @@ public class StyleSheetJsonParser {
 		}
 
 		JSONObject styles = obj.getJSONObject("styles");
-		for (String key : styles.keySet()) {
-			JSONObject style = styles.getJSONObject(key);
-			StylingProperties sp = createStyle(style);
-			sheet.addStyleIndex(key, sp);
+		Set<String> toConsider = new HashSet<>(styles.keySet());
+		while (!toConsider.isEmpty()) {
+			int sizeBefore = toConsider.size();
+			for (Iterator<String> iterator = toConsider.iterator(); iterator.hasNext();) {
+				String key = iterator.next();
+				JSONObject style = styles.getJSONObject(key);
+				if (style.has("base") && toConsider.contains(style.getString("base"))) {
+					// Postpone processing this style until the style is resolved
+					continue;
+				}
+				StylingProperties sp = createStyle(sheet, style);
+				sheet.addStyleIndex(key, sp);
+				iterator.remove();
+			}
+			if (sizeBefore == toConsider.size()) {
+				throw new IllegalStateException("Circular dependency in the style, cannot resolve " + toConsider);
+			}
 		}
-		
 		Condition cond = parseCondition(obj.getJSONObject("styling"), sheet);
 		sheet.setCondition(cond);
-		
+
 		return sheet;
 	}
-	
-	
+
 	private static Condition parseCondition(JSONObject json, StyleSheet sheet) {
-		
+
 		List<Tag> conditions = new ArrayList<>();
 		List<Condition> matchingValues = new ArrayList<>();
-		
+
 		for (String key : json.keySet()) {
-			
+
 			JSONObject values = json.getJSONObject(key);
-			
-			for(String value : values.keySet()) {
+
+			for (String value : values.keySet()) {
 				Tag t = new Tag(key, value.equals("*") ? null : value);
 				conditions.add(t);
-				
+
 				Object style = values.get(value);
-				if(style instanceof String) {
+				if (style instanceof String) {
 					String name = (String) style;
-					if(!sheet.hasStyle(name)) {
-						throw new IllegalArgumentException("The style "+name+" is not known");
-					}
 					matchingValues.add(new Condition(sheet.getStyle(name)));
-				}else {
+				} else {
 					matchingValues.add(parseCondition((JSONObject) style, sheet));
 				}
 			}
@@ -108,7 +117,7 @@ public class StyleSheetJsonParser {
 		}
 		return tagList;
 	}
-	
+
 	private static List<Tags> addToAll(List<Tags> tagList, Tag tag) {
 		for (Tags tags : tagList) {
 			tags.getOtherTags().add(tag);
@@ -116,10 +125,16 @@ public class StyleSheetJsonParser {
 		return tagList;
 	}
 
-	private static StylingProperties createStyle(JSONObject properties) {
+	private static StylingProperties createStyle(StyleSheet sheet, JSONObject properties) {
 		StylingProperties sp = new StylingProperties();
 
 		Set<String> unused = new HashSet<>(properties.keySet());
+		StylingProperties base = null;
+		if (properties.has("base")) {
+			String baseName = properties.getString("base");
+			base = sheet.getStyle(baseName);
+			unused.remove("base");
+		}
 
 		for (Field f : sp.getClass().getFields()) {
 			if (!properties.has(f.getName())) {
@@ -142,7 +157,7 @@ public class StyleSheetJsonParser {
 			System.err.println("Warning: unused properties in style: " + unused);
 		}
 
-		return sp;
+		return sp.mergeWith(base);
 	}
 
 	private static Color asColor(String color) {
