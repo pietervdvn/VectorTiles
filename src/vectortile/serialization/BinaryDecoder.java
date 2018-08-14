@@ -13,39 +13,40 @@ import vectortile.data.Tags;
 import vectortile.data.VectorTile;
 import vectortile.data.Way;
 
-public class BinaryDecoder {
+public class BinaryDecoder extends Decoder<VectorTile> {
 
 	private final static List<Tag> EMPTY = new ArrayList<>();
-	private final DataInputStream in;
+	private DataInputStream in;
 
-	public BinaryDecoder(InputStream in) {
-		this.in = new DataInputStream(in);
-	}
-
-	
-	public VectorTile deserialize() throws IOException {
-
+	public VectorTile deserialize(InputStream instream) throws IOException {
+		in = new DataInputStream(instream);
 		// Start with reading metainformation: bounds
 		int minLat = in.readInt();
 		int minLon = in.readInt();
 		int maxLat = in.readInt();
 		int maxLon = in.readInt();
-
-		TagDecoder localDecoder = readLessCommonTagTable();
+		
+		boolean compactedTags = in.readBoolean();
+		TagDecoder localDecoder;
+		if(compactedTags) {
+			localDecoder = readLessCommonTagTable();
+		}else {
+			localDecoder = null;
+		}
+		
 		List<Node> nodes = readNodes();
 		List<Node> ghostNodes = readNodes();
-		readNodeTagging(nodes);
-
-		List<Way> ways = readWays();
+		readNodeTagging(nodes, compactedTags);
+		List<Way> ways = readWays(compactedTags);
 
 		return new VectorTile(minLat, minLon, maxLat, maxLon, localDecoder, 0, nodes, ghostNodes, ways, null);
 	}
 
 	private TagDecoder readLessCommonTagTable() throws IOException {
-		return new TagDecoder(readPairs(), readPairs(), readPairs());
+		return new TagDecoder(readTagList(), readTagList(), readTagList());
 	}
 
-	private List<Way> readWays() throws IOException {
+	private List<Way> readWays(boolean compactedTags) throws IOException {
 		int l = in.readInt();
 		int nodeEncoded = in.readInt();
 		List<Way> ways = new ArrayList<>(l + nodeEncoded);
@@ -58,8 +59,8 @@ public class BinaryDecoder {
 				nodeIds.add((long) nodeCounter);
 				nodeCounter++;
 			}
-			nodeIds.set(s, nodeIds.get(0));
-			ways.add(new Way(readTags(), nodeIds));
+			nodeIds.add(nodeIds.get(0));
+			ways.add(new Way(readTags(compactedTags), nodeIds));
 		}
 
 		for (int count = 0; count < l; count++) {
@@ -69,7 +70,7 @@ public class BinaryDecoder {
 			for (int i = 0; i < ll; i++) {
 				nodeIds.add((long) in.readInt());
 			}
-			Tags t = readTags();
+			Tags t = readTags(compactedTags);
 			Way w = new Way(t, nodeIds);
 			ways.add(w);
 		}
@@ -83,23 +84,22 @@ public class BinaryDecoder {
 		for (int i = 0; i < l; i++) {
 			int lat = in.readInt();
 			int lon = in.readInt();
-			nodes.add(new Node(lat, lon));
+			nodes.add(new Node(lat, lon, null));
 		}
 		return nodes;
 	}
 
-
-	private void readNodeTagging(List<Node> nodes) throws IOException {
+	private void readNodeTagging(List<Node> nodes, boolean compactedTags) throws IOException {
 		int taggedNodes = in.readInt();
 		for (int count = 0; count < taggedNodes; count++) {
 			int i = in.readInt();
 			Node n = nodes.get(i);
-			Tags t = readTags();
+			Tags t = readTags(compactedTags);
 			n.setTags(t);
 		}
 	}
 
-	private Tags readTags() throws IOException {
+	private Tags readTags(boolean compactedTags) throws IOException {
 		/**
 		 * First we read the number of common tags (byte), followed by those common tags
 		 * (bytes) After this, we read (as strings) the other tags.
@@ -113,15 +113,17 @@ public class BinaryDecoder {
 		length = in.readInt();
 		List<Integer> lessCommonTags = new ArrayList<>(length);
 		for (int i = 0; i < length; i++) {
-			lessCommonTags.add((int) in.readByte());
+			lessCommonTags.add((int) in.readInt());
 		}
 
-		// List<Pair> otherTags = readPairs(in);
-		// All tags are encoded as lessCommontags
-		return new Tags(commonTags, lessCommonTags, EMPTY);
+		List<Tag> tagList = EMPTY;
+		if(!compactedTags) {
+			tagList = readTagList();
+		}
+		return new Tags(commonTags, lessCommonTags, tagList);
 	}
 
-	private List<Tag> readPairs() throws IOException {
+	private List<Tag> readTagList() throws IOException {
 		int length = in.readInt();
 		List<Tag> pairs = new ArrayList<>();
 		for (int i = 0; i < length; i++) {

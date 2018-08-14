@@ -1,6 +1,9 @@
 package vectortile.serialization;
 
+import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -20,6 +23,12 @@ public class BinaryEncoder {
 		this.vt = vt;
 	}
 
+	public void serialize(String path) throws IOException {
+		try (OutputStream out = new BufferedOutputStream(new FileOutputStream(new File(path)))) {
+			serialize(out);
+		}
+	}
+
 	public void serialize(OutputStream os) throws IOException {
 
 		/**
@@ -37,34 +46,38 @@ public class BinaryEncoder {
 		out.writeInt(vt.getMaxLat());
 		out.writeInt(vt.getMaxLon());
 
-		writeLessCommonTagTable(out, vt.getDecoder());
-
+		
+		boolean compactedTags = vt.getDecoder() != null;
+		out.writeBoolean(compactedTags);
+		if(compactedTags) {
+			writeLessCommonTagTable(out, vt.getDecoder());
+		}
 		int taggedNodes = writeNodes(out, vt.getNodes());
-
 		writeNodes(out, vt.getGhostNodes());
-		writeNodeTagging(out, vt.getNodes(), taggedNodes);
+		writeNodeTagging(out, vt.getNodes(), taggedNodes, compactedTags);
 
-		writeWays(out, vt.getNodeEncodedWays(), vt.getWays());
+		writeWays(out, vt.getNodeEncodedWays(), vt.getWays(), compactedTags);
+
+
 		System.out.println("Done! Written " + out.size() + " bytes");
 	}
 
 	private static void writeLessCommonTagTable(DataOutputStream out, TagDecoder td) throws IOException {
-		writePairs(out, td.getNodeTags());
-		writePairs(out, td.getWaytags());
-		writePairs(out, td.getRelationTags());
+		writeTagList(out, td.getNodeTags());
+		writeTagList(out, td.getWaytags());
+		writeTagList(out, td.getRelationTags());
 	}
 
-	private static void writeWays(DataOutputStream out, int nodeEncoded, List<Way> ways) throws IOException {
+	private static void writeWays(DataOutputStream out, int nodeEncoded, List<Way> ways, boolean compactedTags) throws IOException {
 		out.writeInt(ways.size() - nodeEncoded);
 		out.writeInt(nodeEncoded);
-		
-		
+
 		for (int i = 0; i < nodeEncoded; i++) {
 			Way w = ways.get(i);
-			out.writeInt(w.getNodes().size()-1); // All node-encoded ways are closed
-			writeTags(out, w.getTags());
+			out.writeInt(w.getNodes().size() - 1); // All node-encoded ways are closed
+			writeTags(out, w.getTags(), compactedTags);
 		}
-		
+
 		for (int i = nodeEncoded; i < ways.size(); i++) {
 			Way w = ways.get(i);
 			List<Long> nodeIds = w.getNodes();
@@ -72,11 +85,10 @@ public class BinaryEncoder {
 			for (long nodeId : nodeIds) {
 				out.writeInt((int) nodeId);
 			}
-			writeTags(out, w.getTags());
+			writeTags(out, w.getTags(), compactedTags);
 		}
 	}
 
-	
 	private static int writeNodes(DataOutputStream out, List<Node> nodes) throws IOException {
 		// Writing the normal nodes
 		out.writeInt(nodes.size());
@@ -92,9 +104,7 @@ public class BinaryEncoder {
 		return taggedNodes;
 	}
 
-	
-
-	private static void writeNodeTagging(DataOutputStream out, List<Node> nodes, int taggedNodes) throws IOException {
+	private static void writeNodeTagging(DataOutputStream out, List<Node> nodes, int taggedNodes, boolean compactedTags) throws IOException {
 		out.writeInt(taggedNodes);
 		for (int i = 0; i < nodes.size(); i++) {
 			Node n = nodes.get(i);
@@ -102,11 +112,11 @@ public class BinaryEncoder {
 				continue;
 			}
 			out.writeInt(i);
-			writeTags(out, n.getTags());
+			writeTags(out, n.getTags(), compactedTags);
 		}
 	}
 
-	private static void writeTags(DataOutputStream out, Tags t) throws IOException {
+	private static void writeTags(DataOutputStream out, Tags t, boolean compactedTags) throws IOException {
 		if (t == null || t.getCount() == 0) {
 			out.writeInt(0);
 			out.writeInt(0);
@@ -123,17 +133,20 @@ public class BinaryEncoder {
 
 		out.writeInt(t.getLessCommonTags().size());
 		for (int i : t.getLessCommonTags()) {
-			out.writeByte(i);
+			out.writeInt(i);
 		}
 
-		if (t.getOtherTags().size() > 0) {
+		if(!compactedTags) {
+			writeTagList(out, t.getOtherTags());
+		}else if (t.getOtherTags().size() > 0) {
 			throw new IllegalStateException("All pairs should be encoded at this point");
 		}
+		
+		
 	}
 
-	private static void writePairs(DataOutputStream out, List<Tag> pairs) throws IOException {
+	private static void writeTagList(DataOutputStream out, List<Tag> pairs) throws IOException {
 		out.writeInt(pairs.size());
-		System.out.println("Writing # pairs" + pairs.size());
 		for (Tag p : pairs) {
 			out.writeUTF(p.key);
 			out.writeUTF(p.value);

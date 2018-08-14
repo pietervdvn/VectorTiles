@@ -7,10 +7,28 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
 public class Utils {
+
+	public static List<Integer> longList2intList(List<Long> elements) {
+		List<Integer> l = new ArrayList<>();
+		for (Long e : elements) {
+			l.add((int) (long) e);
+		}
+		return l;
+	}
+
+	public static List<Long> intList2longList(List<Integer> elements) {
+		List<Long> l = new ArrayList<>();
+		for (Integer e : elements) {
+			l.add((long) e);
+		}
+		return l;
+	}
 
 	/**
 	 * Sends response to the calling process.

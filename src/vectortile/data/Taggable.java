@@ -7,10 +7,6 @@ public abstract class Taggable {
 
 	private Tags tags;
 
-	public Taggable() {
-		this.tags = null;
-	}
-
 	public Taggable(Tags tags) {
 		this.tags = tags;
 	}

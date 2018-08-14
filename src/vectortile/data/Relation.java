@@ -8,13 +8,11 @@ import vectortile.tools.MultiRemapper;
 
 public class Relation extends Taggable {
 
-	public final Member[] members;
+	private final List<Member> members;
 
-	public Relation(List<Member> members) {
-		this.members = new Member[members.size()];
-		for (int i = 0; i < this.members.length; i++) {
-			this.members[i] = members.get(i);
-		}
+	public Relation(List<Member> members, Tags t) {
+		super(t);
+		this.members = members;
 	}
 
 	public void rewrite(MultiRemapper r) {
@@ -22,6 +20,7 @@ public class Relation extends Taggable {
 			member.remap(r);
 		}
 	}
+	
 
 	public String toString(TagDecoder td) {
 		String result = "Relation ";
@@ -33,4 +32,16 @@ public class Relation extends Taggable {
 		return result;
 	}
 
+	public List<Member> getMembers() {
+		return members;
+	}
+
+	public boolean containsRelation() {
+		for (Member member : members) {
+			if(member.type == Types.RELATION) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

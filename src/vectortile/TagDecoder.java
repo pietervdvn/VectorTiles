@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import vectortile.data.Tag;
+import vectortile.data.Taggable;
 import vectortile.data.Tags;
 
 public class TagDecoder {
 
 	private final List<Tag> nodeTags, waytags, relationTags;
-
-	private final static List<Integer> EMPTY = new ArrayList<Integer>();
 
 	public TagDecoder(List<Tag> nodeTags, List<Tag> waytags, List<Tag> relationTags) {
 		this.nodeTags = nodeTags;
@@ -31,21 +30,30 @@ public class TagDecoder {
 		this("res");
 	}
 
-	public Tags buildTagsFor(Types t, List<Tag> tags) {
-		List<Integer> knownTags = new ArrayList<>();
+	public void encodeAll(Types type, List<? extends Taggable> taggables, boolean globalTags) {
+		for (Taggable t : taggables) {
+			t.setTags(buildTagsFor(type, t.getTags(), globalTags));
+		}
+	}
+
+	private Tags buildTagsFor(Types t, Tags tags, boolean globalTags) {
+		List<Integer> commonTags = new ArrayList<>();
+		List<Integer> lessCommonTags = new ArrayList<>();
 		List<Tag> otherTags = new ArrayList<>();
 
-		for (Tag pair : tags) {
+		for (Tag pair : tags.getOtherTags()) {
 			Integer encoded = encode(t, pair);
 			if (encoded != null) {
-				knownTags.add(encoded);
+				if (globalTags) {
+					commonTags.add(encoded);
+				} else {
+					lessCommonTags.add(encoded);
+				}
 			} else {
 				otherTags.add(pair);
 			}
 		}
-
-		return new Tags(knownTags, EMPTY, otherTags);
-
+		return new Tags(commonTags, lessCommonTags, otherTags);
 	}
 
 	/**

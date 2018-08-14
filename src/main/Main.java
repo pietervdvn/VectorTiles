@@ -1,10 +1,5 @@
 package main;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +11,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-import osm2vectortile.RawData;
 import peer.Peer;
 import peer.PeerList;
 import peer.PeerListFetcher;
@@ -32,6 +26,9 @@ import tileFetching.RemoteFetcher;
 import tileFetching.TileServlet;
 import vectortile.TagDecoder;
 import vectortile.data.VectorTile;
+import vectortile.optimizers.TagCompactor;
+import vectortile.optimizers.VectorTileClipper;
+import vectortile.optimizers.VectorTileReshuffler;
 import vectortile.serialization.BinaryDecoder;
 import vectortile.serialization.BinaryEncoder;
 import vectortile.serialization.OSMXMLParser;
@@ -41,31 +38,34 @@ public class Main {
 	public final static int VERSION = 1;
 
 	public static void main(String[] args) throws IOException, XMLStreamException, InterruptedException {
-		TagDecoder td = new TagDecoder();
-		double minlat = 51.215;
-		double minlon = 3.2189324;
-		double maxlat = 51.2162391;
-		double maxlon = 3.2223657;
-		OSMXMLParser p = new OSMXMLParser(td, 51215, 3218);
-		RawData raw = p.parseXML("/home/pietervdvn/Downloads/RawOsm.xml");
 
-		VectorTile vt = raw.createTile(minlat, minlon, maxlat, maxlon, false);
-		// *
+		TagDecoder td = new TagDecoder();
+
+		OSMXMLParser p = new OSMXMLParser();
+		VectorTile vt = p.deserialize("/home/pietervdvn/Downloads/RawOsm.xml");
+
+		vt = new VectorTileClipper(vt).createOptimized();
+		vt = new TagCompactor(vt).createOptimized();
+		vt = new VectorTileReshuffler(vt).createOptimized();
+
+		//vt = testSer(vt);
+		render(vt);
+	}
+	
+	public static VectorTile testSer(VectorTile vt) throws IOException, XMLStreamException {
 		BinaryEncoder ser = new BinaryEncoder(vt);
 		String path = "/home/pietervdvn/Downloads/VectorTile.bin";
-		try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(new File(path)))) {
-			ser.serialize(out);
-		}
-
-		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(new File(path)))) {
-			vt = BinaryDecoder.deserialize(in);
-		} // */
-			// *
+		ser.serialize(path);
+		
+		return new BinaryDecoder().deserialize(path);
+	}
+	
+	public static void render(VectorTile vt) throws InterruptedException, IOException {
 		SimpleWindow sw = new SimpleWindow();
 		sw.add(new VectorTilePanel(vt));
 		Thread.sleep(50000);
 		sw.dispose();
-		System.exit(0);// */
+		System.exit(0);
 	}
 
 	public static void main0(String[] args) throws Exception {

@@ -1,9 +1,5 @@
 package vectortile.serialization;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +32,7 @@ import vectortile.tools.MultiRemapper;
  * @author pietervdvn
  *
  */
-public class OSMXMLParser {
+public class OSMXMLParser extends Decoder<VectorTile> {
 
 	private static final List<Integer> EMPTY = new ArrayList<>();
 
@@ -62,19 +58,9 @@ public class OSMXMLParser {
 
 	// IDentifier of either the relation or way that is being parsed
 	private long lastWayID;
-	
-	
-	private final InputStream in;
-	
-	public OSMXMLParser(InputStream in) {
-		this.in = in;
-	}
-	
-	public OSMXMLParser(String path) throws FileNotFoundException {
-		this.in = new BufferedInputStream(new FileInputStream(new File(path)));
-	}
 
-	public VectorTile deserialize() throws XMLStreamException {
+	@Override
+	public VectorTile deserialize(InputStream in) throws XMLStreamException {
 		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 		XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(in);
 		while (xmlEventReader.hasNext()) {
@@ -124,7 +110,7 @@ public class OSMXMLParser {
 			int nLon = getLatLonRel(elem, "lon", minLon);
 			long id = getAttrLong(elem, "id");
 
-			Node n = new Node(nLat, nLon);
+			Node n = new Node(nLat, nLon, null);
 			createdLast = n;
 			nodes.put(id, n);
 			break;
@@ -150,17 +136,16 @@ public class OSMXMLParser {
 	private void handleXMLCloseEvent(EndElement elem) {
 		switch (elem.getName().getLocalPart()) {
 		case "node":
-			createdLast.setTags(createTags(Types.NODE));
+			createdLast.setTags(createTags());
 			break;
 		case "way":
-			Way w = new Way(createTags(Types.WAY), runningNodeList);
+			Way w = new Way(createTags(), new ArrayList<>(runningNodeList));
 			runningNodeList.clear();
 			ways.put(lastWayID, w);
 			break;
 		case "relation":
-			Relation r = new Relation(runningMemberList);
+			Relation r = new Relation(runningMemberList, createTags());
 			runningMemberList.clear();
-			r.setTags(createTags(Types.RELATION));
 			relations.put(lastWayID, r);
 			break;
 		default:
@@ -168,7 +153,7 @@ public class OSMXMLParser {
 		}
 	}
 
-	private Tags createTags(Types type) {
+	private Tags createTags() {
 		Tags t = new Tags(EMPTY, EMPTY, new ArrayList<>(runningTagList));
 		runningTagList.clear();
 		return t;

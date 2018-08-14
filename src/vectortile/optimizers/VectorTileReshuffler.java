@@ -20,7 +20,7 @@ import vectortile.tools.MultiRemapper;
  * (When writing the nodelist to file, we order the first N nodes to be the
  * first nodes of way W. Then, we write the nodes for W2, ... )
  */
-public class VectorTileReshuffler {
+public class VectorTileReshuffler extends Optimizer {
 
 	private final VectorTile vt;
 	/*
@@ -45,44 +45,8 @@ public class VectorTileReshuffler {
 		this.ways = new ArrayList<>(vt.getWays());
 	}
 
-	private boolean eligibleForEncoding(Way way) {
-		List<Long> wayNodes = way.getNodes();
-		if (wayNodes.get(0) != wayNodes.get(wayNodes.size() - 1)) {
-			// Only closed nodes are allowed for way-encoding
-			return false;
-		}
-		
-		Set<Long> nodesSeen = new HashSet<Long>();
-		for (int i =0; i<wayNodes.size(); i++) {
-			long nId = wayNodes.get(i);
-			int nid = (int) nId;
-			
-			if(vt.isGhostNode(nid)) {
-				// Can't do this with ghost nodes for now
-				return false;
-			}
-			
-			if(nodes.get(nid) == null) {
-				// Already used in another way, already moved
-				return false;
-			}
-			
-			if (nodesSeen.contains(nId) && 
-					!(i == wayNodes.size()-1 && nId == wayNodes.get(0))) {
-				// The way reuses the same node multiple times
-				// Let's not encode it...
-				// Except for the last element of course, it should equal the first
-				return false;
-			}
-			nodesSeen.add(nId);
-		}
-		
-		return true;
-		
-	}
-
-	public VectorTile constructShuffledTile() {
-
+	@Override
+	public VectorTile createOptimized() {
 		// Sort the ways to get the longest ways upfront
 		ways.sort(Way.LENGTH_COMPARATOR_DESC);
 
@@ -122,13 +86,44 @@ public class VectorTileReshuffler {
 		// At last, change the indices everywhere
 		MultiRemapper mr = new MultiRemapper(nodeRemapping, wayRemapping, new HashMap<>());
 		mr.apply(newWays, relations);
-		
-		
-		
+
 		// And get the new vectortile out!
-		return new VectorTile(vt.getMinLat(), vt.getMinLon(), vt.getMaxLat(), vt.getMaxLon(),//
-				vt.getDecoder(), nodeEncoded, newNodes, vt.getGhostNodes(),
-				newWays, relations);
+		return new VectorTile(vt.getMinLat(), vt.getMinLon(), vt.getMaxLat(), vt.getMaxLon(), //
+				vt.getDecoder(), nodeEncoded, newNodes, vt.getGhostNodes(), newWays, relations);
+	}
+
+	private boolean eligibleForEncoding(Way way) {
+		List<Long> wayNodes = way.getNodes();
+		if (wayNodes.get(0) != wayNodes.get(wayNodes.size() - 1)) {
+			// Only closed nodes are allowed for way-encoding
+			return false;
+		}
+
+		Set<Long> nodesSeen = new HashSet<Long>();
+		for (int i = 0; i < wayNodes.size(); i++) {
+			long nId = wayNodes.get(i);
+			int nid = (int) nId;
+
+			if (vt.isGhostNode(nid)) {
+				// Can't do this with ghost nodes for now
+				return false;
+			}
+
+			if (nodes.get(nid) == null) {
+				// Already used in another way, already moved
+				return false;
+			}
+
+			if (nodesSeen.contains(nId) && !(i == wayNodes.size() - 1 && nId == wayNodes.get(0))) {
+				// The way reuses the same node multiple times
+				// Let's not encode it...
+				// Except for the last element of course, it should equal the first
+				return false;
+			}
+			nodesSeen.add(nId);
+		}
+
+		return true;
 	}
 
 	private static <T> void copyLeftovers(List<T> source, List<T> sink, Map<Long, Long> remapping) {

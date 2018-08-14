@@ -20,7 +20,7 @@ public class VectorTile {
 	 * indicate the upper left corner or a tile
 	 */
 	private final int minLat, minLon, maxLat, maxLon;
-	public final static int COORDINATES_SCALING_FACTOR = 1000;
+	public final static int COORDINATES_SCALING_FACTOR = Node.NODE_SCALING_FACTOR;
 
 	/**
 	 * Recodes the tags which appear a lot locally
@@ -35,8 +35,11 @@ public class VectorTile {
 
 	public VectorTile(double minLatWGS84, double minLonWGS84, double maxLatWGS84, double maxLonWGS84, //
 			List<Node> nodes, List<Way> ways, List<Relation> relations) {
-		this((int) minLatWGS84 * COORDINATES_SCALING_FACTOR, (int) minLonWGS84 * COORDINATES_SCALING_FACTOR,
-				(int) maxLatWGS84 * COORDINATES_SCALING_FACTOR, (int) maxLonWGS84 * COORDINATES_SCALING_FACTOR, //
+		this(//
+				(int) (minLatWGS84 * COORDINATES_SCALING_FACTOR), //
+				(int) (minLonWGS84 * COORDINATES_SCALING_FACTOR), //
+				(int) (maxLatWGS84 * COORDINATES_SCALING_FACTOR), //
+				(int) (maxLonWGS84 * COORDINATES_SCALING_FACTOR), //
 				null, 0, nodes, new ArrayList<Node>(), ways, relations);
 	}
 
@@ -62,12 +65,16 @@ public class VectorTile {
 		return ghostNodes.get(nId - nodes.size());
 	}
 
+	public Way getWay(int i) {
+		return ways.get(i);
+	}
+
 	public boolean isGhostNode(int nId) {
 		return nId >= nodes.size();
 	}
 
-	public List<Node> getGhostNodes() {
-		return ghostNodes;
+	public Relation getRelation(int i) {
+		return relations.get(i);
 	}
 
 	public String debugDecodedWays() {
@@ -114,19 +121,27 @@ public class VectorTile {
 	}
 
 	public double getMaxLatWGS84() {
-		return (double) maxLat / COORDINATES_SCALING_FACTOR;
+		return ((double) maxLat) / COORDINATES_SCALING_FACTOR;
 	}
 
 	public double getMaxLonWGS84() {
-		return (double) maxLon / COORDINATES_SCALING_FACTOR;
+		return ((double) maxLon) / COORDINATES_SCALING_FACTOR;
 	}
 
 	public double getMinLatWGS84() {
-		return (double) minLat / COORDINATES_SCALING_FACTOR;
+		return ((double) minLat) / COORDINATES_SCALING_FACTOR;
 	}
 
 	public double getMinLonWGS84() {
-		return (double) minLon / COORDINATES_SCALING_FACTOR;
+		return ((double) minLon) / COORDINATES_SCALING_FACTOR;
+	}
+
+	public int WGS84toNodeLat(double lat) {
+		return (int) ((lat - getMinLatWGS84()) * Node.NODE_SCALING_FACTOR);
+	}
+
+	public int WGS84toNodeLon(double lon) {
+		return (int) ((lon - getMinLonWGS84()) * Node.NODE_SCALING_FACTOR);
 	}
 
 	public int getNodeEncodedWays() {
@@ -147,6 +162,10 @@ public class VectorTile {
 
 	public TagDecoder getDecoder() {
 		return decoder;
+	}
+
+	public List<Node> getGhostNodes() {
+		return ghostNodes;
 	}
 
 }

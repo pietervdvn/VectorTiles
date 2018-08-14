@@ -21,8 +21,9 @@ public class VectorTilePanel extends JPanel {
 
 	private final VectorTile vt;
 
-	private final int PIXELS_PER_LAT = 30;
+	private final int PIXELS_PER_DEGREE = 500000;
 
+	private final double refLat, refLon;
 	private final int offsetX, offsetY;
 
 	private final Styler styler;
@@ -30,8 +31,10 @@ public class VectorTilePanel extends JPanel {
 	public VectorTilePanel(VectorTile vt) throws IOException {
 		this.vt = vt;
 
-		offsetX = 250 + (-vt.getMinLon() / PIXELS_PER_LAT);
-		offsetY = 250 + vt.getMaxLat() / PIXELS_PER_LAT;
+		refLat = vt.getMaxLatWGS84();
+		refLon = vt.getMinLonWGS84();
+		offsetX = 100;
+		offsetY = 150;
 		styler = new Styler(new TagDecoder(), vt.getDecoder());
 	}
 
@@ -50,11 +53,11 @@ public class VectorTilePanel extends JPanel {
 
 		g.setColor(Color.RED);
 
-		int minX = lonToX(vt.getMinLon());
-		int minY = latToY(vt.getMinLat());
-		System.out.println(minY);
-		int maxX = lonToX(vt.getMaxLon());
-		int maxY = latToY(vt.getMaxLat());
+		int minY = latToY(vt.getMinLatWGS84());
+		int minX = lonToX(vt.getMinLonWGS84());
+		int maxY = latToY(vt.getMaxLatWGS84());
+		int maxX = lonToX(vt.getMaxLonWGS84());
+		System.out.println(minX + ", " + minY + "; " + maxX + ", " + maxY);
 
 		g.drawLine(minX, minY, minX, maxY);
 		g.drawLine(minX, maxY, maxX, maxY);
@@ -74,7 +77,6 @@ public class VectorTilePanel extends JPanel {
 		}
 
 		g.setColor(Color.BLACK);
-
 		for (Way w : vt.getWays()) {
 			Node last = null;
 			boolean lastGhost = false;
@@ -88,7 +90,7 @@ public class VectorTilePanel extends JPanel {
 					if (isGhost && lastGhost) {
 
 					} else {
-						g.setColor(style.lineColor);
+						g.setColor(Color.BLACK);
 						g.drawLine(getX(last), getY(last), getX(current), getY(current));
 					}
 
@@ -118,19 +120,18 @@ public class VectorTilePanel extends JPanel {
 	}
 
 	private int getX(Node n) {
-		return lonToX(n.getLon());
+		return lonToX(n.getWGS84Lon(vt));
 	}
 
 	private int getY(Node n) {
-		return latToY(n.getLat());
+		return latToY(n.getWGS84Lat(vt));
 	}
 
-	private int latToY(int lat) {
-		return (offsetY - lat / PIXELS_PER_LAT);
+	private int latToY(double lat) {
+		return offsetY + (int) ((lat - refLat) * (-1) * PIXELS_PER_DEGREE);
 	}
 
-	private int lonToX(int lon) {
-		return (lon / PIXELS_PER_LAT) + offsetX;
+	private int lonToX(double lon) {
+		return offsetX + (int) ((lon - refLon) * PIXELS_PER_DEGREE);
 	}
-
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import vectortile.Types;
+import vectortile.data.Member;
 import vectortile.data.Relation;
 import vectortile.data.Way;
 
@@ -45,8 +46,8 @@ public class MultiRemapper {
 			return;
 		}
 		for (Relation r : rels) {
-			for (int i = 0; i < r.members.length; i++) {
-				r.members[i].remap(this);
+			for (Member m : r.getMembers()) {
+				m.remap(this);
 			}
 		}
 	}

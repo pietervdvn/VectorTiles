@@ -9,13 +9,13 @@ import vectortile.Types;
 /**
  * A compact representation of the full tagsset for objects.
  * 
- * Note that these are compacted based on context:
- * - Globally common tags are encoded with a number (e.g.'building=yes' is number '0' for ways)
- * - Within the vectortile, all tags are grouped similarly as well.
- * - During constructions (before the local tag table is built), otherTags will be populated as well.
+ * Note that these are compacted based on context: - Globally common tags are
+ * encoded with a number (e.g.'building=yes' is number '0' for ways) - Within
+ * the vectortile, all tags are grouped similarly as well. - During
+ * constructions (before the local tag table is built), otherTags will be
+ * populated as well.
  */
 public class Tags {
-
 
 	private final List<Integer> commonTags;
 	private final List<Integer> lessCommonTags; // Tags that turned out to be common locally
@@ -83,24 +83,27 @@ public class Tags {
 		return "{\n" + tags + "}\n";
 	}
 
-	public boolean contains(Types t, TagDecoder global, TagDecoder td, String key, String value) {
-		Integer commonTag = global.encode(t, new Tag(key, value));
+	public boolean contains(Types type, TagDecoder global, TagDecoder td, String key, String value) {
+		Tag t = new Tag(key, value);
+		Integer commonTag = global.encode(type, t);
 		if (commonTag != null) {
 			int index = Collections.binarySearch(commonTags, commonTag);
 			if (index >= 0) {
 				return true;
 			}
 		}
-		Integer otherTag = td.encode(t, new Tag(key, value));
-		if (otherTag != null) {
-			int index = Collections.binarySearch(lessCommonTags, otherTag);
-			if (index >= 0) {
-				return true;
+		if (td != null) {
+			Integer otherTag = td.encode(type, t);
+			if (otherTag != null) {
+				int index = Collections.binarySearch(lessCommonTags, otherTag);
+				if (index >= 0) {
+					return true;
+				}
 			}
 		}
-		return false;
+		return this.otherTags.contains(t);
 	}
-	
+
 	public List<Integer> getMemberOfRelations() {
 		return memberOfRelations;
 	}

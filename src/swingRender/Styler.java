@@ -25,6 +25,7 @@ public class Styler {
 	private static final Color invis = new Color(128, 0, 0, 0);
 	public static final StylingProperties INVISIBLE = new StylingProperties(invis, invis);
 	public static final StylingProperties BLACK_WAY = new StylingProperties(Color.BLACK, invis);
+	public static final StylingProperties RED_WAY = new StylingProperties(Color.RED, invis);
 
 	public static final StylingProperties BLACK = new StylingProperties(Color.BLACK, Color.BLACK);
 	public static final StylingProperties GRAY = new StylingProperties(Color.LIGHT_GRAY, Color.LIGHT_GRAY);
@@ -38,6 +39,9 @@ public class Styler {
 	}
 
 	public StylingProperties getStylingFor(Types t, Tags tags) {
+		if(tags == null) {
+			return RED_WAY;
+		}
 		if (tags.contains(t, global, local, "leisure", "garden")) {
 			return GREEN;
 		}
@@ -54,7 +58,7 @@ public class Styler {
 		if(tags.contains(t, global, local, "amenity", "college")) {
 			return GRAY;
 		}
-		return INVISIBLE;
+		return RED_WAY;
 	}
 
 }

@@ -27,7 +27,7 @@ public class Way extends Taggable {
 	@Override
 	public String toString() {
 		String result = "way ";
-		for (Long nid : nodes.subList(0, 3)) {
+		for (Long nid : nodes.subList(0, Math.min(3, nodes.size()))) {
 			result += nid + ", ";
 			
 		}
