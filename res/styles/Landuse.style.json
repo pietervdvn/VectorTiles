@@ -1,0 +1,91 @@
+{
+	"name": "Landuse",
+	"description": "A simple landuse style",
+	"minzoom": 15,
+	"first-selection":[
+		{"landuse":"*"},
+		{"leisure": ["park", "garden"]}
+	]
+	,
+	"styles": {
+		"green": {
+			"fillcolor": "#CDEBB0"
+		},
+
+		"lightgreen": {
+			"fillcolor": "#88ff88"
+		},
+
+		"landuse":{
+			"fillcolor":"#999999"
+		},
+		"building":{
+			"fillcolor":"#D9D0C9",
+			"linecolor":"#C6BAB1"
+		},
+		"otherbuilding":{
+			"fillcolor":"#ffffff",
+			"linecolor":"#C6BAB1"
+		},
+		"white":{
+			"linecolor":"#ffffff",
+			"linewidth":10
+		},
+		"yellow":{
+			"linecolor":"#F7FABF",
+			"linewidth":15
+		}
+	},
+
+	"styling": {
+		"leisure" : {
+			"park" : 
+				"lightgreen",
+			"garden" : 
+				{"access": {
+					"public" : "lightgreen",
+					"*"		: "green"}
+				}
+		},
+
+		"landuse" : {
+			"*" : "landuse"
+		},
+
+
+		"amenity" : {
+			"*" : "otherbuilding"
+		},
+
+
+		"building":{
+			"*" : "building"
+
+		},
+
+		"highway":{
+			"residential": "white",
+			"tertiary":	"yellow"
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	}
+}

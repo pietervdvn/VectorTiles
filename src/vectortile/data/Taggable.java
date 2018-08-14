@@ -19,11 +19,11 @@ public abstract class Taggable {
 		this.tags = tags;
 	}
 
-	public String toString(Types t, TagDecoder td) {
+	public String toString(Types t, TagDecoder td, TagDecoder local) {
 		if (tags == null) {
 			return "\n";
 		}
-		return tags.toString(t, td);
+		return tags.toString(t, td, local);
 	}
 
 }

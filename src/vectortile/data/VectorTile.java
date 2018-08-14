@@ -92,13 +92,13 @@ public class VectorTile {
 	public String toString(TagDecoder td) {
 		String result = "Vector tile (" + minLat + ", " + minLon + "; " + maxLat + ", " + maxLon + "):\n";
 		for (int i = 0; i < nodes.size(); i++) {
-			result += i + ": " + nodes.get(i).toString(td);
+			result += i + ": " + nodes.get(i).toString(td, getDecoder());
 		}
 		for (int i = 0; i < ways.size(); i++) {
-			result += i + ": " + ways.get(i).toString(td);
+			result += i + ": " + ways.get(i).toString(td, getDecoder());
 		}
 		for (int i = 0; i < relations.size(); i++) {
-			result += i + ": " + relations.get(i).toString(td);
+			result += i + ": " + relations.get(i).toString(td, getDecoder());
 		}
 
 		return result;
@@ -167,5 +167,6 @@ public class VectorTile {
 	public List<Node> getGhostNodes() {
 		return ghostNodes;
 	}
+	
 
 }

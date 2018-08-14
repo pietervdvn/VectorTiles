@@ -22,12 +22,12 @@ public class Relation extends Taggable {
 	}
 	
 
-	public String toString(TagDecoder td) {
+	public String toString(TagDecoder td, TagDecoder local) {
 		String result = "Relation ";
 		for (Member member : members) {
 			result += member + ", ";
 		}
-		result += getTags().toString(Types.RELATION, td);
+		result += getTags().toString(Types.RELATION, td, local);
 
 		return result;
 	}

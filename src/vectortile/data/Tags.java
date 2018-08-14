@@ -1,5 +1,6 @@
 package vectortile.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,65 +23,28 @@ public class Tags {
 	private final List<Tag> otherTags; // NOT Serialized
 	private List<Integer> memberOfRelations; // Mainly used for rendering. Repopulated during serialization
 
+	private final static ArrayList<Integer> EMPTY = new ArrayList<>();
+	
+	public Tags(String... tags) {
+		commonTags = EMPTY;
+		lessCommonTags = EMPTY;
+		otherTags = new ArrayList<>();
+		for (int i = 0; i < tags.length; i+=2) {
+			otherTags.add(new Tag(tags[i], tags [i+1]));
+		}
+	}
+	
+	public Tags(List<Tag> tags) {
+		this(EMPTY, EMPTY, tags);
+	}
+	
 	public Tags(List<Integer> commonTags, List<Integer> lessCommonTags, List<Tag> othertags) {
 		this.commonTags = commonTags;
 		this.lessCommonTags = lessCommonTags;
 		this.otherTags = othertags;
-		for (Integer integer : lessCommonTags) {
-			if (integer == null) {
-				throw new NullPointerException("Null element in lessCommonTags");
-			}
-		}
-		for (Integer integer : commonTags) {
-			if (integer == null) {
-				throw new NullPointerException("Null element in commontaglist");
-			}
-		}
 		Collections.sort(commonTags);
 		Collections.sort(lessCommonTags);
 
-	}
-
-	public List<Integer> getCommonTags() {
-		return commonTags;
-	}
-
-	public List<Integer> getLessCommonTags() {
-		return lessCommonTags;
-	}
-
-	public List<Tag> getOtherTags() {
-		return otherTags;
-	}
-
-	public int getCount() {
-		return lessCommonTags.size() + commonTags.size() + otherTags.size();
-	}
-
-	@Override
-	public String toString() {
-		String tags = "";
-		for (int i : commonTags) {
-			tags += i + ", ";
-		}
-		for (Tag pair : otherTags) {
-			tags += pair + ", ";
-		}
-
-		return "{" + tags + "}";
-	}
-
-	public String toString(Types t, TagDecoder td) {
-
-		String tags = "";
-		for (int i : commonTags) {
-			tags += "  " + td.decode(t, i) + "(common tag #" + i + ")\n";
-		}
-		for (Tag pair : otherTags) {
-			tags += "  " + pair + "\n";
-		}
-
-		return "{\n" + tags + "}\n";
 	}
 
 	public boolean contains(Types type, TagDecoder global, TagDecoder td, String key, String value) {
@@ -103,9 +67,66 @@ public class Tags {
 		}
 		return this.otherTags.contains(t);
 	}
+	
+
+	@Override
+	public String toString() {
+		String tags = "";
+		for (int i : commonTags) {
+			tags += i + ", ";
+		}
+		for (int i : lessCommonTags) {
+			tags += i + ", ";
+		}
+		for (Tag pair : otherTags) {
+			tags += pair + ", ";
+		}
+
+		return "{" + tags + "}";
+	}
+
+	public String toString(Types t, TagDecoder td, TagDecoder local) {
+
+		String tags = "";
+		for (int i : commonTags) {
+			tags += "  " + td.decode(t, i) + "(common tag #" + i + ")\n";
+		}
+		for (int i : lessCommonTags) {
+			tags += "  " + local.decode(t, i) + "(lcommon tag #" + i + ")\n";
+		}
+		for (Tag pair : otherTags) {
+			tags += "  " + pair + "\n";
+		}
+
+		return "{\n" + tags + "}\n";
+	}
+	
+	public int getCount() {
+		return lessCommonTags.size() + commonTags.size() + otherTags.size();
+	}
+
 
 	public List<Integer> getMemberOfRelations() {
 		return memberOfRelations;
 	}
+	
+	public List<Integer> getCommonTags() {
+		return commonTags;
+	}
+
+	public List<Integer> getLessCommonTags() {
+		return lessCommonTags;
+	}
+
+	public List<Tag> getOtherTags() {
+		return otherTags;
+	}
+	
+	public Tags addOther(Tag t) {
+		List<Tag> newTags = new ArrayList<>(otherTags);
+		newTags.add(t);
+		return new Tags(commonTags, lessCommonTags, newTags);
+	}
+
 
 }

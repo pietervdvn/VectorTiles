@@ -36,9 +36,9 @@ public class TagDecoder {
 		}
 	}
 
-	private Tags buildTagsFor(Types t, Tags tags, boolean globalTags) {
-		List<Integer> commonTags = new ArrayList<>();
-		List<Integer> lessCommonTags = new ArrayList<>();
+	public Tags buildTagsFor(Types t, Tags tags, boolean globalTags) {
+		List<Integer> commonTags = new ArrayList<>(tags.getCommonTags());
+		List<Integer> lessCommonTags = new ArrayList<>(tags.getLessCommonTags());
 		List<Tag> otherTags = new ArrayList<>();
 
 		for (Tag pair : tags.getOtherTags()) {
@@ -60,7 +60,7 @@ public class TagDecoder {
 	 * Will be null if not a common tag!
 	 */
 	public Integer encode(Types t, Tag p) {
-		List<Tag> pairs = selectTable(t);
+		List<Tag> pairs = getTagList(t);
 		for (int i = 0; i < pairs.size(); i++) {
 			if (p.equals(pairs.get(i))) {
 				return i;
@@ -70,10 +70,10 @@ public class TagDecoder {
 	}
 
 	public Tag decode(Types t, int code) {
-		return selectTable(t).get(code);
+		return getTagList(t).get(code);
 	}
 
-	private List<Tag> selectTable(Types t) {
+	public List<Tag> getTagList(Types t) {
 		switch (t) {
 		case NODE:
 			return nodeTags;
@@ -99,6 +99,26 @@ public class TagDecoder {
 		return decodedationTable;
 	}
 
+	public final List<Integer> tagsWithKey(Types t, String key, boolean negate) {
+		List<Integer> tagsWithKey = new ArrayList<>();
+		List<Tag> tagList = getTagList(t);
+		for (int i = 0; i < tagList.size(); i++) {
+			if (tagList.get(i).key.equals(key)) {
+				if (negate) {
+					tagsWithKey.add(-1 - i);
+				} else {
+					tagsWithKey.add(i);
+				}
+			}
+		}
+		return tagsWithKey;
+	}
+
+	@Override
+	public String toString() {
+		return nodeTags + "\n" + waytags + "\n" + relationTags;
+	}
+
 	public List<Tag> getNodeTags() {
 		return nodeTags;
 	}
@@ -110,4 +130,5 @@ public class TagDecoder {
 	public List<Tag> getRelationTags() {
 		return relationTags;
 	}
+
 }

@@ -27,8 +27,8 @@ public class Node extends Taggable {
 		this.lon = lon;
 	}
 
-	public String toString(TagDecoder td) {
-		return "node: " + lat + ", " + lon + super.toString(Types.NODE, td);
+	public String toString(TagDecoder td, TagDecoder local) {
+		return "node: " + lat + ", " + lon + super.toString(Types.NODE, td, local);
 	}
 
 	@Override

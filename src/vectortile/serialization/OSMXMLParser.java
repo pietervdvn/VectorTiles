@@ -34,8 +34,8 @@ import vectortile.tools.MultiRemapper;
  */
 public class OSMXMLParser extends Decoder<VectorTile> {
 
-	private static final List<Integer> EMPTY = new ArrayList<>();
-
+	public static final String OPENSTREETMAP_DATA = "https://www.openstreetmap.org/api/0.6/map?bbox={minlon},{minlat},{maxlon},{maxlat}";
+	
 	// Lat & lon (times 1000) of the upper left corner of the reference point
 	private double minLat, maxLat, minLon, maxLon;
 
@@ -154,7 +154,7 @@ public class OSMXMLParser extends Decoder<VectorTile> {
 	}
 
 	private Tags createTags() {
-		Tags t = new Tags(EMPTY, EMPTY, new ArrayList<>(runningTagList));
+		Tags t = new Tags(new ArrayList<>(runningTagList));
 		runningTagList.clear();
 		return t;
 	}

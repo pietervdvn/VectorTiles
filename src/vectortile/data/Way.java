@@ -20,8 +20,8 @@ public class Way extends Taggable {
 		rewrite.rewriteAll(nodes);
 	}
 
-	public String toString(TagDecoder td) {
-		return this.toString() + super.toString(Types.WAY, td);
+	public String toString(TagDecoder td, TagDecoder local) {
+		return this.toString() + super.toString(Types.WAY, td, local);
 	}
 
 	@Override
