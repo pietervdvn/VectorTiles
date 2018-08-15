@@ -8,6 +8,7 @@ import java.net.URL;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -20,7 +21,7 @@ public class LoadingPanel extends JPanel {
 
 	boolean loading = true;
 
-	public LoadingPanel(VectorTileID vid, CacheManager cm, final TagDecoder global, final MasterSheet sheet) {
+	public LoadingPanel(final JFrame parent, VectorTileID vid, CacheManager cm, final TagDecoder global, final MasterSheet sheet) {
 		
 		setPreferredSize(new Dimension(500, 500));
 
@@ -45,7 +46,7 @@ public class LoadingPanel extends JPanel {
 				LoadingPanel.this.removeAll();
 				try {
 					LoadingPanel.this.add(new VectorTilePanel(cm.retrieve(vid), global, sheet));
-					LoadingPanel.this.repaint();
+					parent.getContentPane().repaint();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

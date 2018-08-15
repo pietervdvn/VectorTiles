@@ -42,7 +42,7 @@ public class CacheManager {
 				id.getLat(), id.getLon(), id.getLat() + width, id.getLon() + width);
 		System.out.println("Download coompleted"); // TODO Remove sysout
 
-		vt = new VectorTileClipper(vt).createOptimized();
+	//	vt = new VectorTileClipper(vt).createOptimized();
 		vt = new TagCompactor(vt).createOptimized();
 		vt = new VectorTileReshuffler(vt).createOptimized();
 

@@ -30,7 +30,7 @@ public class VectorTilePanel extends JPanel {
 	private final VectorTile vt;
 	private final TagDecoder global;
 
-	private double pixelPerMeter = 2;
+	private double pixelPerDeciMeter = 3;
 
 	final private static double R_MAJOR = 6378137.0;
 	final private static double R_MINOR = 6356752.3142;
@@ -42,6 +42,7 @@ public class VectorTilePanel extends JPanel {
 
 	public VectorTilePanel(VectorTile vt, TagDecoder globalDecoder, MasterSheet sh) {
 		this(vt, globalDecoder, sh, 0, 0);
+		
 	}
 
 	public VectorTilePanel(VectorTile vt, TagDecoder globalDecoder, MasterSheet sh, int offsetX, int offsetY) {
@@ -53,7 +54,7 @@ public class VectorTilePanel extends JPanel {
 
 		this.offsetX = offsetX - lonToX(refLon);
 		this.offsetY = offsetY - latToY(refLat);
-		Dimension size = new Dimension(lonToX(vt.getMaxLonWGS84()), latToY(vt.getMinLatWGS84()));
+		Dimension size = new Dimension(333,333);
 		this.setPreferredSize(size);
 
 		this.sheet = sh;
@@ -62,6 +63,9 @@ public class VectorTilePanel extends JPanel {
 
 	@Override
 	protected void paintComponent(Graphics g) {
+		long start = System.currentTimeMillis();
+		System.out.println("PAINTING"); // TODO Remove sysout
+		
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -70,13 +74,15 @@ public class VectorTilePanel extends JPanel {
 		for (StyleSheet s : sheet.getLayers()) {
 			drawContents(g2, texts, s);
 		}
-		
+
 		drawTexts(g2, texts);
+		System.out.println("Rendering took "+(System.currentTimeMillis()-start)+"ms"); // TODO Remove sysout
+		
 	}
-	
+
 	private static void drawTexts(Graphics2D g, Set<Text> texts) {
 		for (Text text : texts) {
-			if(text == null) {
+			if (text == null) {
 				continue;
 			}
 			StylingProperties sp = text.style;
@@ -144,11 +150,10 @@ public class VectorTilePanel extends JPanel {
 			g.setColor(style.fillcolor);
 			g.fillPolygon(way2polygon(w));
 		}
-		
-		int x =	lonToX(w.getCenter().getWGS84Lon(vt));
-		int y =	latToY(w.getCenter().getWGS84Lat(vt));
-		texts.add(createText(x, y, Types.WAY, style, w.getTags()));
 
+		int x = lonToX(w.getCenter().getWGS84Lon(vt));
+		int y = latToY(w.getCenter().getWGS84Lat(vt));
+		texts.add(createText(x, y, Types.WAY, style, w.getTags()));
 
 		if (style.linecolor == null) {
 			return;
@@ -253,11 +258,11 @@ public class VectorTilePanel extends JPanel {
 		con = Math.pow(((1.0 - con) / (1.0 + con)), com);
 		double ts = Math.tan(0.5 * ((Math.PI * 0.5) - phi)) / con;
 		double y = 0 - R_MAJOR * Math.log(ts);
-		return offsetY + (int) (y * pixelPerMeter * -1);
+		return offsetY + (int) (y * pixelPerDeciMeter * -1);
 	}
 
 	private int lonToX(double lon) {
-		return offsetX + (int) (R_MAJOR * Math.toRadians(lon) * pixelPerMeter); 
+		return offsetX + (int) (R_MAJOR * Math.toRadians(lon) * pixelPerDeciMeter);
 	}
 
 	private static class Text {
@@ -273,16 +278,16 @@ public class VectorTilePanel extends JPanel {
 			this.style = style;
 		}
 	}
-	
+
 	public double getPixelPerMeter() {
-		return pixelPerMeter;
+		return pixelPerDeciMeter;
 	}
-	
+
 	public void setPixelPerMeter(double pixelPerMeter) {
-		if(this.pixelPerMeter == pixelPerMeter) {
+		if (this.pixelPerDeciMeter == pixelPerMeter) {
 			return;
 		}
-		this.pixelPerMeter = pixelPerMeter;
+		this.pixelPerDeciMeter = pixelPerMeter;
 		this.repaint();
 	}
 

@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.eclipse.jetty.server.Server;
@@ -41,6 +43,8 @@ public class Main {
 	static MasterSheet sheet;
 	static ExecutorService threads = Executors.newFixedThreadPool(1);
 
+	public static double INCREASE = 0.001;
+	
 	public static void main(String[] args) throws Exception {
 
 		AppContext appContext = new AppContext("prod.properties");
@@ -50,36 +54,43 @@ public class Main {
 		global = new TagDecoder();
 		sheet = new MasterSheet("res/styles");
 
-		GridLayout gl = new GridLayout(3, 3);
+		int w = 4;
+		int h = 3;
+		GridLayout gl = new GridLayout(h, w);
+		SimpleWindow f = new SimpleWindow();
+		gl.setVgap(0);
+		gl.setHgap(0);
 		JPanel all = new JPanel(gl);
-		double lat = 51.215;
-		for (int r = 0; r < 2; r++) {
-			double lon = 3.22;
-			for (int l = 0; l < 2; l++) {
-				all.add(panelFor(lat, lon));
-				lon += 0.005;
+		all.setPreferredSize(new Dimension(w*333, h*333));
+		double lat = 51.216;
+		for (int r = 0; r < h; r++) {
+			double lon = 3.218;
+			for (int c = 0; c < w; c++) {
+				all.add(panelFor(f, lat, lon));
+				lon += INCREASE;
 			}
-			lat -= 0.005;
+			lat -= INCREASE;
 		}
 		threads.shutdown();
-		new SimpleWindow(all);
+		f.add(all);
+		f.goLive();
 	}
 
-	private static JPanel panelFor(double lat, double lon) {
+	private static JPanel panelFor(JFrame f, double lat, double lon) {
 		final VectorTileID vid = new VectorTileID(lat, lon);
 		Runnable task = new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					cm.retrieveOrDownload(vid, 0.005);
+					cm.retrieveOrDownload(vid, INCREASE);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		};
 		threads.submit(task);
-		return new LoadingPanel(vid, cm, global, sheet);
+		return new LoadingPanel(f, vid, cm, global, sheet);
 	}
 
 	public static void main0(String[] args) throws Exception {
